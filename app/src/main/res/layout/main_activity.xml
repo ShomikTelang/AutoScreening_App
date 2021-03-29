@@ -49,19 +49,6 @@
         android:textSize="40sp" />
 
 
-
-
-<!--    <EditText-->
-<!--        android:id="@+id/name"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="140dp"-->
-<!--        android:layout_marginBottom="8sp"-->
-<!--        android:hint="Enter Name"-->
-<!--        android:imeActionLabel="actionDone"-->
-<!--        android:inputType="textNoSuggestions"-->
-<!--        android:textSize="40sp" />-->
-
-
     <TextView
         android:id="@+id/result"
         android:layout_width="762dp"
