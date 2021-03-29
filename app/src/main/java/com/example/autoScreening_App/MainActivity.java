@@ -59,7 +59,6 @@ import static com.example.autoScreening_App.MainActivity2.category;
 import static com.example.autoScreening_App.MainActivity2.getAddress;
 import static com.example.autoScreening_App.MainActivity2.getNumber;
 import static com.example.autoScreening_App.MainActivity2.screener;
-import static com.example.autoScreening_App.MainActivity2.zion;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -80,20 +79,15 @@ public class MainActivity extends AppCompatActivity {
     int counterExit = 0;
     int enterSign = 0;
     int exitSign = 0;
-    int backButtonSign = 0;
-    int backButtonSign2 = 0;
     int visitorEnterSign = 0;
     int visitorEnterSign2 = 0;
     int visitorEnterSign3  = 0;
     int visitorExitSign = 0;
     int counterChronic = 0;
     int person = 0;
-    int david = 0;
     int personleave = 0;
     int backClick = 0;
     int name = 0;
-    int shiva = 0;
-    int kyrie = 0;
     int visiting = 0;
     int otherFamilyStart = 0;
     int personCondition = 0;
@@ -114,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     signature mSignature;
     Bitmap bitmap,scaledBitmap;
     String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/Signatures - Month " + signatureMonth + "/";
-
 
     public static DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
     public static DateFormat df2 = new SimpleDateFormat("MM");
@@ -1411,7 +1404,6 @@ public class MainActivity extends AppCompatActivity {
                                         mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
                                         x = 1;
                                         z = 1;
-                                        //mSupervisor.setVisibility(View.INVISIBLE);
                                         mName.setVisibility(View.VISIBLE);
                                         mName.setHint("Enter Name");
                                         mEnter.setVisibility(View.INVISIBLE);
@@ -1462,7 +1454,6 @@ public class MainActivity extends AppCompatActivity {
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.e("help", "working");
                     String word3 = "Do you have shortness of breath, chest tightness, or body aches?";
                     text.setText(word3);
                     Handler handler2 = new Handler();
@@ -1486,7 +1477,6 @@ public class MainActivity extends AppCompatActivity {
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.e("help","hello");
                     String word3 = "Do you have diarrhea, nausea, vomiting, or loss of taste and smell?";
                     text.setText(word3);
                     Handler handler2 = new Handler();
