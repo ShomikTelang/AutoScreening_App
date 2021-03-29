@@ -132,10 +132,6 @@ public class MainActivity extends AppCompatActivity {
     int testing = 0;
     String date = java.text.DateFormat.getTimeInstance().format(new Date());
 
-
-    //TextView mTextTv;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,8 +144,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         // Button to open signature panel
         btn_get_sign = (Button) findViewById(R.id.signature);
 
@@ -159,9 +153,6 @@ public class MainActivity extends AppCompatActivity {
         if (!file.exists()) {
             file.mkdir();
         }
-
-
-
 
         mEnter = findViewById(R.id.entering);
         mExit = findViewById(R.id.exiting);
@@ -218,11 +209,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
-//
         text = findViewById(R.id.shomtext);
 
         mEnter.setOnClickListener(new View.OnClickListener() {
@@ -233,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
                 if(MainActivity2.visitingState == true) {
                     mEnter.setVisibility(View.INVISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
-                    Log.e("help","zion");
                     String word3 = "Please select if you are a family visitor or other visitor.";
                     text.setText(word3);
                     mTTS.speak("Please select if you are a family visitor or other visitor.", TextToSpeech.QUEUE_FLUSH, null);
@@ -246,30 +231,21 @@ public class MainActivity extends AppCompatActivity {
                     otherFamilyStart = 1;
                 }
                 else {
-
-                    zion = 0;
-                    Log.e("help","didnotwork");
-
                     mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
                     x = 1;
                     z = 1;
-                    //mSupervisor.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.VISIBLE);
-//                mTemp.setVisibility(View.VISIBLE);
                     mName.setHint("Enter Name");
                     mEnter.setVisibility(View.INVISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
                     speak();
                     counterEnter = 0;
-                                name = 0;
-                                String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                                btn_get_sign.setVisibility(View.VISIBLE);
-                                mYes.setEnabled(true);
-                                mNo.setEnabled(true);
-                                enterSign = 1;
-
-                    Log.e("value", "hello");
-
+                    name = 0;
+                    String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
+                    btn_get_sign.setVisibility(View.VISIBLE);
+                    mYes.setEnabled(true);
+                    mNo.setEnabled(true);
+                    enterSign = 1;
                     mTemperature.setVisibility(View.INVISIBLE);
                     mResult.setVisibility(View.INVISIBLE);
                 }
@@ -287,25 +263,20 @@ public class MainActivity extends AppCompatActivity {
                 name = 2;
                 getNumber = "";
                 getAddress = "";
-                if(zion ==1){
+                if(MainActivity2.visitingState == true){
                     category = "VISITOR ||";
                 }else{
                     category = "EMPLOYEE ||";
                 }
 
-//
+
                 mName.setVisibility(View.VISIBLE);
                 key += 1;
-                //mSupervisor.setVisibility(View.INVISIBLE);
                 mName.setHint("Enter Name");
                 mEnter.setVisibility(View.INVISIBLE);
                 mExit.setVisibility(View.INVISIBLE);
-
-
-
                 personleave = 1;
                 person = 0;
-
                 speak();
                 counterExit = 0;
                 name = 0;
@@ -495,7 +466,6 @@ public class MainActivity extends AppCompatActivity {
                             mTTS.speak("Do you have any chronic conditions that may lead to these symptoms?", TextToSpeech.QUEUE_FLUSH, null);
                             x += 1;
                             z = 4;
-
                         }
                     }, 0);
                 }
@@ -783,7 +753,6 @@ public class MainActivity extends AppCompatActivity {
                                             handler.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    david = 1;
                                                     mTemp.setVisibility(View.INVISIBLE);
                                                     mName.setVisibility(View.INVISIBLE);
                                                     String weird = "Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?";
