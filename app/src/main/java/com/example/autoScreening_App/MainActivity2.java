@@ -121,9 +121,7 @@ public class MainActivity2 extends AppCompatActivity {
                                             + "\r\n" + "4. Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?" + "\r\n" + "IF YES - 5. Do you match the COVID-19 vaccination criteria?" +
                                             "\r\n" + "6. Have you worked in facilities or offices with recognized COVID-19 cases?" + "\r\n" + "IF YES - 7. Were you wearing recommended personal protective equipment?";
                                     String questionsExit = "\r\n" + "1. Have you developed any symptoms that were referenced upon entry?";
-                                    // String cont = "\r\n" + "\r\n" + "SCREENER: " + mName.getText().toString();
                                     String cont = "\r\n" + "SCREENER:  " + enterText.getText().toString();
-                                    //fileWriter.append(cont);
                                     fileWriter.append(breaker);
                                     fileWriter.append(keyEnter);
                                     fileWriter.append(questionsEnter);
@@ -142,10 +140,8 @@ public class MainActivity2 extends AppCompatActivity {
                                             + "\r\n" + "2. Do you have shortness of breath, chest tightness, or body aches?" + "\r\n" + "3. Do you have diarrhea, nausea, vomiting, or loss of taste and smell?"
                                             + "\r\n" + "4. Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?" + "\r\n" + "IF YES - 5. Do you match the COVID-19 vaccination criteria?" +
                                             "\r\n" +  "6. Have you worked in facilities or offices with recognized COVID-19 cases?" + "\r\n" + "IF YES - 7. Were you wearing recommended personal protective equipment?";
-                                    String questionsExit2 = "\r\n" + "1. Have you developed any symptoms that were referenced upon entry?";
-                                    // String cont = "\r\n" + "\r\n" + "SCREENER: " + mName.getText().toString();
+                                    String questionsExit2 = "\r\n" + "1. Have you developed any symptoms that were referenced upon entry?"; 
                                     String cont2 = "\r\n" + "SCREENER:  " + enterText.getText().toString();
-                                    //fileWriter.append(cont);
                                     fileWriter2.append(breaker2);
                                     fileWriter2.append(keyEnter2);
                                     fileWriter2.append(questionsEnter2);
@@ -156,7 +152,6 @@ public class MainActivity2 extends AppCompatActivity {
                                     fileWriter2.append(cont2);
                                     fileWriter2.close();
                                 } else if (screener != 0) {
-                                    Log.e("help","sucker");
                                     FileWriter fileWriter2 = new FileWriter(file2, true);
                                     String cont2 = "\r\n" + "SCREENER:  " + enterText.getText().toString();
                                     fileWriter2.append(cont2);
@@ -166,8 +161,8 @@ public class MainActivity2 extends AppCompatActivity {
                                     String cont3 = "\r\n" + "SCREENER:  " + enterText.getText().toString();
                                     fileWriter3.append(cont3);
                                     fileWriter3.close();
-
                                 }
+                                
                             }catch(FileNotFoundException e){
                                 e.printStackTrace();
                             } catch(IOException e){
@@ -185,8 +180,6 @@ public class MainActivity2 extends AppCompatActivity {
                                     mVisitor.setVisibility(View.VISIBLE);
                                     mEmployee.setVisibility(View.VISIBLE);
                                     text.setText("Select if you are a visitor, employee, or screening supervisor.");
-
-
                                 }
                             }, 500);
 
