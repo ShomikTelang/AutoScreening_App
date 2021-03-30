@@ -42,8 +42,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -53,13 +51,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Timer;
 
 import static com.example.autoScreening_App.MainActivity2.category;
 import static com.example.autoScreening_App.MainActivity2.getAddress;
 import static com.example.autoScreening_App.MainActivity2.getNumber;
 import static com.example.autoScreening_App.MainActivity2.screener;
-import static com.example.autoScreening_App.MainActivity2.zion;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,41 +64,26 @@ public class MainActivity extends AppCompatActivity {
     private Button mExit;
     private Button mYes;
     private Button mNo;
-    private Button backButton;
     private TextView text;
     private TextView mResult;
     private Button mTemperature;
     private EditText mName;
     private EditText mTemp;
-    private Timer timer = new Timer();
-    private final long DELAY = 1000;
     int counterEnter = 0;
-    int counterExit = 0;
     int enterSign = 0;
     int exitSign = 0;
-    int backButtonSign = 0;
-    int backButtonSign2 = 0;
     int visitorEnterSign = 0;
     int visitorEnterSign2 = 0;
     int visitorEnterSign3  = 0;
-    int visitorExitSign = 0;
-    int counterChronic = 0;
-    int person = 0;
-    int david = 0;
     int personleave = 0;
-    int backClick = 0;
     int name = 0;
-    int shiva = 0;
-    int kyrie = 0;
     int visiting = 0;
-    int otherFamilyStart = 0;
-    int personCondition = 0;
-    boolean familyVisitor = false;
-    boolean otherVisitor = false;
+    int otherFamilySelection = 0;
+   
     @SuppressLint("SimpleDateFormat")
     public static DateFormat dateFormat = new SimpleDateFormat("MM-dd");
-    public static Date shomik = new Date();
-    public static String fileDate = dateFormat.format(shomik);
+    public static Date newDate = new Date();
+    public static String fileDate = dateFormat.format(newDate);
 
     Toolbar toolbar;
     Button btn_get_sign, mClear, mGetSign, mCancel;
@@ -112,28 +93,32 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout mContent;
     View view;
     signature mSignature;
-    Bitmap bitmap,scaledBitmap;
+    Bitmap bitmap;
     String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/Signatures - Month " + signatureMonth + "/";
 
 
     public static DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
     public static DateFormat df2 = new SimpleDateFormat("MM");
-    public static Date travis = new Date();
-    public static String signatureMonth = df2.format(travis);
-    public static Date drake = new Date();
-    public static String shortDate = df.format(drake);
+    public static Date date1 = new Date();
+    public static String signatureMonth = df2.format(date1);
+    public static Date date2 = new Date();
+    public static String shortDate = df.format(date2);
 
-    int x = 0;
-    int y = 0;
-    int key = 0;
-    int z = 0;
-    int b = 0;
-    int backTemp = 0;
-    int testing = 0;
+    //These are lot of various counter variables, I use to track the flow of the questionnaire
+    //The names explain their purpose fairly well
+    int answerYes= 0;
+    int exitingState = 0;
+    int answerNo = 0;
+    int exitTemp = 0;
+    int visitorInformation = 0;
     String date = java.text.DateFormat.getTimeInstance().format(new Date());
+    
+    /* 
+    Note: The hardest code in this project was the functions I created at the bottom. The questionnaire flow was long and time taking, but it follows the same logic throughout the code
+            As you look at the code, you will see similar code being repeated for different situations
+            I created functions to decrease redundency, but I continue to make efforts to make my code more efficient and clean
+     */
 
-
-    //TextView mTextTv;
 
 
     @Override
@@ -141,28 +126,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
+        //Permissions to create file in device's storage
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
         }
 
+        //Declaring the various elements in my activity that my app is composed of
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
-        // Button to open signature panel
         btn_get_sign = (Button) findViewById(R.id.signature);
-
         btn_get_sign.setVisibility(View.INVISIBLE);
 
         file = new File(DIRECTORY);
         if (!file.exists()) {
             file.mkdir();
         }
-
-
-
-
         mEnter = findViewById(R.id.entering);
         mExit = findViewById(R.id.exiting);
         mResult = findViewById(R.id.result);
@@ -177,16 +155,13 @@ public class MainActivity extends AppCompatActivity {
         mYes.setVisibility(View.INVISIBLE);
         mNo.setVisibility(View.INVISIBLE);
         mTemp.setVisibility(View.INVISIBLE);
-        backButton = findViewById(R.id.back2);
-        backButton.setEnabled(true);
-        backButton.setVisibility(View.INVISIBLE);
 
+        //Text-To-Speech Module code
         mTTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
                     int result = mTTS.setLanguage(Locale.US);
-                    Log.e("TTS", "work man");
                     mTTS.speak("Please select if you are entering or exiting. You must answer all questions with yes or no.", TextToSpeech.QUEUE_FLUSH, null);
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
@@ -219,12 +194,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-//
         text = findViewById(R.id.shomtext);
 
+        //After the user has started the screening, it asks if the user is entering or exiting the facility
+        //If the user is an employee who clicks enter, it begins by asking the user their name and to sign
+        //If the user is a visitor who clicks enter, it begins by asking the user if they are a family visitor or other visitor
         mEnter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -233,7 +207,6 @@ public class MainActivity extends AppCompatActivity {
                 if(MainActivity2.visitingState == true) {
                     mEnter.setVisibility(View.INVISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
-                    Log.e("help","zion");
                     String word3 = "Please select if you are a family visitor or other visitor.";
                     text.setText(word3);
                     mTTS.speak("Please select if you are a family visitor or other visitor.", TextToSpeech.QUEUE_FLUSH, null);
@@ -243,104 +216,81 @@ public class MainActivity extends AppCompatActivity {
                     mYes.setText("FAMILY VISITOR");
                     mNo.setVisibility(View.VISIBLE);
                     mNo.setText("OTHER VISITOR");
-                    otherFamilyStart = 1;
+                    otherFamilySelection = 1;
                 }
                 else {
-
-                    zion = 0;
-                    Log.e("help","didnotwork");
-
                     mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                    x = 1;
-                    z = 1;
-                    //mSupervisor.setVisibility(View.INVISIBLE);
+                    answerYes = 1;
+                    answerNo = 1;
                     mName.setVisibility(View.VISIBLE);
-//                mTemp.setVisibility(View.VISIBLE);
                     mName.setHint("Enter Name");
                     mEnter.setVisibility(View.INVISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
                     speak();
-                    counterEnter = 0;
-                                name = 0;
-                                String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                                btn_get_sign.setVisibility(View.VISIBLE);
-                                mYes.setEnabled(true);
-                                mNo.setEnabled(true);
-                                enterSign = 1;
-
-                    Log.e("value", "hello");
-
+                    btn_get_sign.setVisibility(View.VISIBLE);
+                    mYes.setEnabled(true);
+                    mNo.setEnabled(true);
+                    enterSign ++;
                     mTemperature.setVisibility(View.INVISIBLE);
                     mResult.setVisibility(View.INVISIBLE);
                 }
-
-
             }
         });
+
+        //After the user has started the screening, it asks if the user is entering or exiting the facility
+        //If the user clicks exit, it begins by asking the user their name and to sign
         mExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mTemp.getText().clear();
-                y = 1;
-                b = 1;
-                name = 2;
+                exitingState = 1;
                 getNumber = "";
                 getAddress = "";
-                if(zion ==1){
+                if(MainActivity2.visitingState){
                     category = "VISITOR ||";
                 }else{
                     category = "EMPLOYEE ||";
                 }
-
-//
+                //Below I use a property called setVisibility to determine if I want to show or not show a certain element on the app screen
                 mName.setVisibility(View.VISIBLE);
-                key += 1;
-                //mSupervisor.setVisibility(View.INVISIBLE);
                 mName.setHint("Enter Name");
                 mEnter.setVisibility(View.INVISIBLE);
                 mExit.setVisibility(View.INVISIBLE);
-
-
-
                 personleave = 1;
-                person = 0;
-
                 speak();
-                counterExit = 0;
-                name = 0;
                 btn_get_sign.setVisibility(View.VISIBLE);
-                exitSign = 1;
-                Log.e("value", "hello");
-
                 mTemperature.setVisibility(View.INVISIBLE);
                 mResult.setVisibility(View.INVISIBLE);
-
-
             }
         });
 
-
+        //Basically, I organized this app by having a YES button clicker and NO button clicker
+        //Under each button, I have a bunch of commands and counter variables to direct the flow of the app
+        //I use a lot of IF-ElSE statements to do this
+        //Below is all of the questions and flow of the app if the user clicked YES to answer a question
         mYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kyrie = 0;
-                if(otherFamilyStart ==1) {
+                //Below is all of the beginning code for the visitor
+                //Most facilities wanted visitors to enter their phone number and address, so I had to add this additional info
+                if(otherFamilySelection == 1) {
                     visiting = 0;
+                    screener ++;
                     mTemp.setVisibility(View.VISIBLE);
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mEnter.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.VISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
-                    screener +=1;
                     mName.setHint("Enter Address: ");
                     mTemp.setHint("Enter Phone Number: ");
                     String word = "Please enter your address and phone number. It will ask for your name later.";
+                    //prints the text on the app screen
                     text.setText(word);
+                    //Uses Text to Speech to speak the question or statement to the user
                     mTTS.speak("Please enter your address and phone number. It will ask for your name later.", TextToSpeech.QUEUE_FLUSH, null);
                     mName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
+                        //Used a property called onEditorAction, so when the user clickes done on the keyboard it will move forward with the app
                         public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                             if (actionId == EditorInfo.IME_ACTION_DONE) {
                                 getAddress = " ADDRESS:" + mName.getText().toString();
@@ -349,7 +299,6 @@ public class MainActivity extends AppCompatActivity {
                             return false;
                         }
                     });
-
                     mTemp.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
                         public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -368,19 +317,16 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                                        x = 1;
-                                        z = 1;
+                                        answerYes= 1;
+                                        answerNo= 1;
                                         mName.setVisibility(View.VISIBLE);
                                         mName.setHint("Enter Name");
                                         mEnter.setVisibility(View.INVISIBLE);
                                         mExit.setVisibility(View.INVISIBLE);
                                         speak();
-                                        name = 0;
                                         String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
                                         btn_get_sign.setVisibility(View.VISIBLE);
                                         visitorEnterSign = 1;
-                                        Log.e("value", "hello");
-
                                         mTemperature.setVisibility(View.INVISIBLE);
                                         mResult.setVisibility(View.INVISIBLE);
                                     }
@@ -393,8 +339,10 @@ public class MainActivity extends AppCompatActivity {
                     });
 
                 }
+
+                //If user answered NO to one of the preliminary visiting questions
                 if(visiting ==1) {
-                    otherFamilyStart = 0;
+                    otherFamilySelection = 0;
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     String word5= "Have you provided a negative COVID-19 test twice in the last week?";
@@ -404,15 +352,15 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Have you provided a negative COVID-19 test twice in the last week?", TextToSpeech.QUEUE_FLUSH, null);
-                            testing =2;
+                            visitorInformation = 2;
                             visiting = 0;
-                            Log.e("help","zion willilamson");
+
 
                         }
                     }, 0);
                 }
-                else if (testing ==2) {
-                    Log.e("help","enterdawg");
+                //Asks the visitor for their phone number and address
+                else if (visitorInformation ==2) {
                     mTemp.setVisibility(View.VISIBLE);
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
@@ -443,19 +391,21 @@ public class MainActivity extends AppCompatActivity {
                                 getAddress = " ADDRESS:" + mName.getText().toString();
                                 getNumber = " NUMBER:" + mTemp.getText().toString() + " ";
                                 category = "VISITOR ||";
-
                                 mName.getText().clear();
                                 mTemp.getText().clear();
                                 mName.setVisibility(View.INVISIBLE);
                                 mTemp.setVisibility(View.INVISIBLE);
 
+                                //A huge part of how I timed the app fuctions is by using two handlers (nested handler)
+                                //Handler allows you to run the code after a given amount of time (given at the bottom)
+                                //Helped with reducing crashes and helping the app move smoothly
                                 Handler handler = new Handler();
-                                handler. postDelayed(new Runnable() {
+                                handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
                                         mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                                        x = 1;
-                                        z = 1;
+                                        answerYes= 1;
+                                        answerNo= 1;
                                         mName.setVisibility(View.VISIBLE);
                                         mName.setHint("Enter Name");
                                         mEnter.setVisibility(View.INVISIBLE);
@@ -466,7 +416,6 @@ public class MainActivity extends AppCompatActivity {
                                         String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
                                         btn_get_sign.setVisibility(View.VISIBLE);
                                         visitorEnterSign3 = 1;
-                                        Log.e("value", "hello");
 
                                         mTemperature.setVisibility(View.INVISIBLE);
                                         mResult.setVisibility(View.INVISIBLE);
@@ -479,13 +428,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if (x == 1) {
+                //This is where the screening begins
+                //If the user answered YES to the first screening question, it will enter this if statement
+                if (answerYes== 1) {
                     visiting = 0;
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
-                    Log.e("helper", "helper");
                     String word3 = "Do you have any chronic conditions that may lead to these symptoms?";
                     text.setText(word3);
                     Handler handler2 = new Handler();
@@ -493,18 +443,18 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have any chronic conditions that may lead to these symptoms?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 4;
+                            answerYes+= 1;
+                            answerNo= 4;
 
                         }
                     }, 0);
                 }
-                else if (x == 2) {
+                //If the user answered YES to the previous question, it will proceed through the screening and enter this if statement
+                else if (answerYes== 2) {
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
-                    Log.i("help", "help");
                     String word = "Do you have shortness of breath, chest tightness, or body aches?";
                     text.setText(word);
                     Handler handler = new Handler();
@@ -512,18 +462,18 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have shortness of breath, chest tightness, or body aches?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 2;
+                            answerYes+= 1;
+                            answerNo= 2;
 
                         }
                     }, 0);
-
-                } else if (x == 3) {
+                }
+                //If the user answered YES to the previous question, it will proceed through the screening and enter this if statement
+                else if (answerYes== 3) {
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
-                    Log.e("help", "help");
                     String word6 = "Do you have any chronic conditions that may lead to these symptoms?";
                     text.setText(word6);
                     Handler handler3 = new Handler();
@@ -531,17 +481,17 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have any chronic conditions that may lead to these symptoms?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 5;
+                            answerYes+= 1;
+                            answerNo= 5;
                         }
                     }, 0);
-                } else if (x == 4) {
-                    backTemp = 0;
+                }
+                //If the user answered YES to the previous question, it will proceed through the screening and enter this if statement
+                else if (answerYes== 4) {
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.i("value", "" + counterEnter);
                     String word4 = "Do you have diarrhea, nausea, vomiting, or loss of taste and smell?";
                     text.setText(word4);
                     Handler handler3 = new Handler();
@@ -549,17 +499,17 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have diarrhea, nausea, vomiting, or loss of taste and smell?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 3;
+                            answerYes+= 1;
+                            answerNo= 3;
                         }
                     }, 0);
-
-                } else if (x == 5) {
+                }
+                //If the user answered YES to the previous question, it will proceed through the screening and enter this if statement
+                else if (answerYes== 5) {
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.e("hello", "why");
                     String word6 = "Do you have any chronic conditions that may lead to these symptoms?";
                     text.setText(word6);
                     Handler handler3 = new Handler();
@@ -567,12 +517,13 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have any chronic conditions that may lead to these symptoms?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 6;
+                            answerYes+= 1;
+                            answerNo= 6;
                         }
                     }, 0);
-                } else if (x == 6) {
-                    backTemp = 1;
+                }
+                //If the user answered YES to the previous question, it will proceed through the screening and enter this if statement
+                else if (answerYes== 6) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -611,8 +562,9 @@ public class MainActivity extends AppCompatActivity {
 
                                 public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-
                                         float number = Float.parseFloat(mTemp.getText().toString());
+                                        //User enters his temperature and clicks done
+                                        //If his/her temperature is too high, it will enter the below if statement
                                         if (number > 99.6 && number < 110) {
                                             Handler handler = new Handler();
                                             handler.postDelayed(new Runnable() {
@@ -631,9 +583,6 @@ public class MainActivity extends AppCompatActivity {
                                                         }
                                                     }, 0);
 
-                                                    Log.i("value", "how are you");
-
-
                                                 }
                                             }, 1000);
                                             Handler handler2 = new Handler();
@@ -647,9 +596,11 @@ public class MainActivity extends AppCompatActivity {
                                                             if (actionId == EditorInfo.IME_ACTION_DONE) {
 
                                                                 float number = Float.parseFloat(mTemp.getText().toString());
+                                                                //User previously entered a temperature that was too high
+                                                                //User now  enters his oral temperature  and clicks done
+                                                                //If his/her oral temperature is too high, it will enter the below if statement
+                                                                //User will fail screening, as they may have a fever
                                                                 if (number > 99.6 && number < 110) {
-
-
                                                                     File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate +"Fail.txt");
                                                                     try {
                                                                         String temp = "[Temp:" + mTemp.getText().toString() + "] ";
@@ -708,7 +659,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     text.setText("Please select if you are entering or exiting. \r\nYou must answer all questions with yes or no.");
                                                                                     mEnter.setVisibility(View.VISIBLE);
                                                                                     mExit.setVisibility(View.VISIBLE);
-                                                                                    x = 0;
+                                                                                    answerYes= 0;
                                                                                     openActivity2();
                                                                                 }
                                                                             }, 5000);
@@ -716,9 +667,7 @@ public class MainActivity extends AppCompatActivity {
                                                                         }
                                                                     }, 1000);
 
-
-//
-
+                                                                    //If the user entered a oral temperature that was normal, it progresses through the screening and enters the below else if
                                                                 } else if (number <= 99.6 && number > 85) {
                                                                     Handler handler = new Handler();
                                                                     handler.postDelayed(new Runnable() {
@@ -733,8 +682,8 @@ public class MainActivity extends AppCompatActivity {
                                                                                 @Override
                                                                                 public void run() {
                                                                                     mTTS.speak("Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?", TextToSpeech.QUEUE_FLUSH, null);
-                                                                                    x += 1;
-                                                                                    z = 7;
+                                                                                    answerYes+= 1;
+                                                                                    answerNo= 7;
                                                                                     mYes.setVisibility(View.VISIBLE);
                                                                                     mNo.setVisibility(View.VISIBLE);
                                                                                 }
@@ -745,9 +694,8 @@ public class MainActivity extends AppCompatActivity {
                                                                     }, 1000);
 
                                                                 }
+                                                                //Makes sure that the user entered a normal temperature (If user entered 10 degrees for temperature it will ask the user to enter again)
                                                                   else {
-//                                                                        mYes.setVisibility(View.VISIBLE);
-//                                                                        mNo.setVisibility(View.VISIBLE);
                                                                         mTemp.setVisibility(View.INVISIBLE);
                                                                         String weird = "You may have entered your temperature incorrectly.";
                                                                         text.setText(weird);
@@ -776,14 +724,13 @@ public class MainActivity extends AppCompatActivity {
 
                                                 }
                                             }, 1000);
-
-
-                                        } else if (number <= 99.6 && number > 85) {
+                                        }
+                                        //If user initially entered a normal temperature it progresses through screening and enters the below else if statement
+                                        else if (number <= 99.6 && number > 85) {
                                             Handler handler = new Handler();
                                             handler.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    david = 1;
                                                     mTemp.setVisibility(View.INVISIBLE);
                                                     mName.setVisibility(View.INVISIBLE);
                                                     String weird = "Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?";
@@ -793,19 +740,19 @@ public class MainActivity extends AppCompatActivity {
                                                         @Override
                                                         public void run() {
                                                             mTTS.speak("Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?", TextToSpeech.QUEUE_FLUSH, null);
-                                                            x += 1;
-                                                            z = 7;
+                                                            answerYes+= 1;
+                                                            answerNo= 7;
                                                             mYes.setVisibility(View.VISIBLE);
                                                             mNo.setVisibility(View.VISIBLE);
                                                         }
                                                     }, 0);
 
-                                                    Log.i("value", "how are you");
-
 
                                                 }
                                             }, 1000);
-                                        } else {
+                                        }
+                                        //Makes sure that the user entered a normal temperature (If user entered 10 degrees for temperature it will ask the user to enter again)
+                                        else {
                                                 mYes.setVisibility(View.VISIBLE);
                                                 mNo.setVisibility(View.VISIBLE);
                                                 mTemp.setVisibility(View.INVISIBLE);
@@ -816,7 +763,6 @@ public class MainActivity extends AppCompatActivity {
                                                     @Override
                                                     public void run() {
                                                         mTTS.speak("You may have entered the temperature incorrectly.", TextToSpeech.QUEUE_FLUSH, null);
-
                                                     }
                                                 }, 0);
                                                 Handler handler3 = new Handler();
@@ -838,21 +784,20 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     });
-
-                } else if (x == 7) {
-                    david =2;
+                }
+                //If user answers YES to previously asked question (Have you had contact for more than 10 min...?)
+                //Enters the below else if statement
+                else if (answerYes== 7) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             mName.setVisibility(View.INVISIBLE);
                             mTemp.setVisibility(View.INVISIBLE);
-                         //   mName.getText().clear();
                             String weird = "Are you: \r\n" +
                                     "1. fully vaccinated (i.e., ≥2 weeks following receipt of the second dose in a 2-dose series, or ≥2 weeks following receipt of one dose of a single-dose vaccine);\n" +
                                     "2. within 3 months following receipt of the last dose in the series; AND,\n" +
@@ -863,26 +808,25 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void run() {
                                     mTTS.speak("Do you match all of the criteria that is listed in the question?", TextToSpeech.QUEUE_FLUSH, null);
-                                    x += 1;
-                                    z = 8;
+                                    answerYes+= 1;
+                                    answerNo= 8;
                                     mYes.setVisibility(View.VISIBLE);
                                     mNo.setVisibility(View.VISIBLE);
                                 }
                             }, 0);
-
-
-
                         }
                     }, 0);
                 }
 
-
-                else if (x == 8) {
+                //If user enters YES to the previous questions it enter the below else if
+                else if (answerYes== 8) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
+                    //Create pass file with the date
                     File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate + "Pass.txt");
+                    //Append user's data to this file
                     try {
                         String temp = " [Temp:" + mTemp.getText().toString() + "] ";
                         String answer1 = " 1-NO ";
@@ -909,6 +853,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
+                    //User has passed the screening and it lets him/her now
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -942,7 +887,9 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     }, 1000);
-                } else if (x == 9) {
+                }
+                //If user responds YES to another screening question before this, it will enter this else if
+                else if (answerYes== 9) {
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -954,16 +901,20 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Were you wearing recommended personal protective equipment?", TextToSpeech.QUEUE_FLUSH, null);
-                            x += 1;
-                            z = 10;
+                            answerYes+= 1;
+                            answerNo= 10;
                         }
                     }, 0);
-                }else if(x == 10) {
+                }
+                //Based on user's responses, it may enter this else if statement
+                else if(answerYes== 10) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
+                    //Again, creates pass file
                     File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate + "Pass.txt");
+                    //Appends data to this file
                     try {
                         String temp = " [Temp:" + mTemp.getText().toString() + "] ";
                         String answer1 = " 1-NO ";
@@ -1028,12 +979,17 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
                 }
-                if (y == 1) {
+
+                //If user is exiting, and answered YES to the exiting question, it enters this if statement
+                if (exitingState == 1) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
 
+                    //Creates fail file
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate + "Fail.txt");
+                    //Appends data to this file
                     try {
                         String answer1 = " 1-YES ";
                         String contExit = "\r\n" + "["+shortDate + " "+ date+"] " + category + " NAME: " + mName.getText().toString() + getNumber + getAddress + " EXITING:";
@@ -1043,16 +999,15 @@ public class MainActivity extends AppCompatActivity {
                         fileWriter.append(answer1);
                         fileWriter.append(cont);
                         Log.v("log_tag", "Panel Saved");
-
                         fileWriter.close();
-                        Log.i("name", cont);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    sendSMS();
 
+                    //User failed so it will call SMS alarm system function
+                    sendSMS();
                     mName.setVisibility(View.INVISIBLE);
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
@@ -1089,19 +1044,17 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
                 }
-
-
             }
         });
 
-
+        //If the user ever clicked NO to enter a question, it will enter this part of the code
         mNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kyrie = 0;
                 mYes.setVisibility(View.INVISIBLE);
                 mNo.setVisibility(View.INVISIBLE);
-                if (b == 1) {
+                //If the user is exiting, and says NO to the first question, it will enter the below if statement
+                if (exitTemp == 1) {
                     String word3 = "Screener, please take the user's temperature. Click the temperature button after completing the temperature scanning.";
                     text.setText(word3);
                     Handler handler2 = new Handler();
@@ -1112,7 +1065,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 0);
 
-//                            mTTS.speak(word3, TextToSpeech.QUEUE_FLUSH, null);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ie) {
@@ -1123,6 +1075,12 @@ public class MainActivity extends AppCompatActivity {
                             mTemperature.setVisibility(View.VISIBLE);
                         }
                     }, 0);
+                    /*
+                        It will enter the same temperature code that I have been using this whole time
+                        It asks the user for their temperature
+                        If the user's temperature is normal, it progresses through the screening, and if it is not, it will ask for oral temperature
+                        If the oral temperature is normal, it progresses through the screening, and if it is not, it will fail the user
+                     */
                     mTemperature.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -1157,8 +1115,6 @@ public class MainActivity extends AppCompatActivity {
                                                         }
                                                     }, 0);
 
-                                                    Log.i("value", "how are you");
-
 
                                                 }
                                             }, 1000);
@@ -1173,7 +1129,7 @@ public class MainActivity extends AppCompatActivity {
                                                             if (actionId == EditorInfo.IME_ACTION_DONE) {
 
                                                                 float number = Float.parseFloat(mTemp.getText().toString());
-                                                                if (number > 99.6 && number <110) {
+                                                                if (number > 99.6 && number < 110) {
                                                                     File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate +"Fail.txt");
                                                                     try {
                                                                         String temp = "[Temp:" + mTemp.getText().toString() + "] ";
@@ -1227,7 +1183,7 @@ public class MainActivity extends AppCompatActivity {
                                                                                     text.setText("Please select if you are entering or exiting. \r\nYou must answer all questions with yes or no.");
                                                                                     mEnter.setVisibility(View.VISIBLE);
                                                                                     mExit.setVisibility(View.VISIBLE);
-                                                                                    x = 0;
+                                                                                    answerYes= 0;
                                                                                     openActivity2();
                                                                                 }
                                                                             }, 5000);
@@ -1304,7 +1260,6 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             }, 1000);
                                       } else if (number <= 99.6 && number > 85) {
-//
                                             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate + "Pass.txt");
                                             try {
                                                 String temp = "[Temp:" + mTemp.getText().toString() + "] ";
@@ -1325,7 +1280,6 @@ public class MainActivity extends AppCompatActivity {
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
-
                                             Handler handler = new Handler();
                                             handler.postDelayed(new Runnable() {
                                                 @Override
@@ -1371,7 +1325,9 @@ public class MainActivity extends AppCompatActivity {
 
                     });
                 }
-                if(otherFamilyStart == 1) {
+
+                //If the user was a visitor, and answered the first question NO, it will enter this if statement
+                if(otherFamilySelection == 1) {
                     mEnter.setVisibility(View.INVISIBLE);
                     mExit.setVisibility(View.INVISIBLE);
 
@@ -1390,15 +1346,14 @@ public class MainActivity extends AppCompatActivity {
                             mYes.setText("YES");
                             mNo.setText("NO");
                             visiting = 1;
-                            otherFamilyStart = 0;
+                            otherFamilySelection = 0;
                         }
                     }, 50);
 
                 }
-
+                //Same as before, app asks the user for their phone number and address
                 if (visiting == 1) {
-                    Log.e("help", "visitingShomik");
-                    testing = 0;
+                    visitorInformation = 0;
                     mTemp.setVisibility(View.VISIBLE);
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
@@ -1440,17 +1395,13 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         mName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
-                                        x = 1;
-                                        z = 1;
-                                        //mSupervisor.setVisibility(View.INVISIBLE);
+                                        answerYes = 1;
+                                        answerNo = 1;
                                         mName.setVisibility(View.VISIBLE);
                                         mName.setHint("Enter Name");
                                         mEnter.setVisibility(View.INVISIBLE);
                                         mExit.setVisibility(View.INVISIBLE);
                                         speak();
-                                        counterEnter = 0;
-                                        name = 0;
-                                        String date = java.text.DateFormat.getDateTimeInstance().format(new Date());
                                         btn_get_sign.setVisibility(View.VISIBLE);
                                         visitorEnterSign2 = 1;
                                         mTemperature.setVisibility(View.INVISIBLE);
@@ -1463,37 +1414,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-
-                if(testing == 2) {
-                    Log.e("help", String.valueOf(testing));
-                    Log.e("help","gethelp");
-                    mYes.setVisibility(View.VISIBLE);
-                    mNo.setVisibility(View.VISIBLE);
-                    String word3 = "Unfortunately, you may not enter. Please contact the nursing home supervisor.";
-                    text.setText(word3);
-                    Handler handler2 = new Handler();
-                    handler2.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTTS.speak("Unfortunately, you may not enter. Please contact the nursing home supervisor.", TextToSpeech.QUEUE_FLUSH, null);
-                            testing = 0;
-                        }
-                    }, 0);
-                    Handler handler10 = new Handler();
-                    handler10.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            openActivity2();
-                        }
-                    },5000);
-                }
-                if (z == 1) {
+                //Same as the pattern for the YES button, I use a combination of IF-ELSE statements to direct the questionnaire flow
+                //The questionnaire flow for when the user answers NO to a screening question is below
+                if (answerNo == 1) {
                     visiting = 0;
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.e("help", "working");
                     String word3 = "Do you have shortness of breath, chest tightness, or body aches?";
                     text.setText(word3);
                     Handler handler2 = new Handler();
@@ -1501,23 +1429,22 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have shortness of breath, chest tightness, or body aches?", TextToSpeech.QUEUE_FLUSH, null);
-                            z += 1;
-                            x = 3;
-                            testing = 0;
+                            answerNo += 1;
+                            answerYes = 3;
+                            visitorInformation = 0;
                             visiting = 0;
                         }
                     }, 0);
 
                 }
-                else if (z == 2) {
-                    backTemp = 0;
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 2) {
                     mYes.setVisibility(View.VISIBLE);
                     mYes.setEnabled(true);
                     mNo.setEnabled(true);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-                    Log.e("help","hello");
                     String word3 = "Do you have diarrhea, nausea, vomiting, or loss of taste and smell?";
                     text.setText(word3);
                     Handler handler2 = new Handler();
@@ -1525,12 +1452,14 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Do you have diarrhea, nausea, vomiting, or loss of taste and smell?", TextToSpeech.QUEUE_FLUSH, null);
-                            z += 1;
-                            x = 5;
+                            answerNo += 1;
+                            answerYes = 5;
                         }
                     }, 0);
-                } else if (z == 3) {
-                    backTemp = 1;
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                //As previously before, it asks for the temperature and follows the same logic
+                else if (answerNo == 3) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -1558,7 +1487,6 @@ public class MainActivity extends AppCompatActivity {
                     mTemperature.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            backTemp = 0;
                             mName.setVisibility(View.INVISIBLE);
                             mTemp.setVisibility(View.VISIBLE);
                             mTemp.setHint("Enter Temperature");
@@ -1570,7 +1498,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-
                                         float number = Float.parseFloat(mTemp.getText().toString());
                                         if (number > 99.6 && number < 110) {
                                             Handler handler = new Handler();
@@ -1589,10 +1516,6 @@ public class MainActivity extends AppCompatActivity {
                                                             mTTS.speak("Your temperature is too high. Please ask the supervisor or a nurse to get your oral temperature.", TextToSpeech.QUEUE_FLUSH, null);
                                                         }
                                                     }, 0);
-
-                                                    Log.i("value", "how are you");
-
-
                                                 }
                                             }, 1000);
                                             Handler handler2 = new Handler();
@@ -1660,17 +1583,13 @@ public class MainActivity extends AppCompatActivity {
                                                                                     text.setText("Please select if you are entering or exiting. \r\nYou must answer all questions with yes or no.");
                                                                                     mEnter.setVisibility(View.VISIBLE);
                                                                                     mExit.setVisibility(View.VISIBLE);
-                                                                                    x = 0;
+                                                                                    answerYes= 0;
                                                                                     openActivity2();
                                                                                 }
                                                                             }, 5000);
 
                                                                         }
                                                                     }, 1000);
-
-
-//
-
                                                                 } else if (number <= 99.6 && number > 85) {
                                                                     Handler handler = new Handler();
                                                                     handler.postDelayed(new Runnable() {
@@ -1685,19 +1604,14 @@ public class MainActivity extends AppCompatActivity {
                                                                                 @Override
                                                                                 public void run() {
                                                                                     mTTS.speak("Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?", TextToSpeech.QUEUE_FLUSH, null);
-                                                                                    z = 7;
-                                                                                    x = 7;
+                                                                                    answerNo= 7;
+                                                                                    answerYes= 7;
                                                                                     mYes.setVisibility(View.VISIBLE);
                                                                                     mNo.setVisibility(View.VISIBLE);
                                                                                 }
                                                                             }, 0);
-
-
                                                                         }
                                                                     }, 1000);
-//
-
-
                                                                 }else {
                                                                     mYes.setVisibility(View.VISIBLE);
                                                                     mNo.setVisibility(View.VISIBLE);
@@ -1709,7 +1623,6 @@ public class MainActivity extends AppCompatActivity {
                                                                         @Override
                                                                         public void run() {
                                                                             mTTS.speak("You may have entered the temperature incorrectly.", TextToSpeech.QUEUE_FLUSH, null);
-
                                                                         }
                                                                     }, 0);
                                                                     Handler handler3 = new Handler();
@@ -1721,8 +1634,6 @@ public class MainActivity extends AppCompatActivity {
                                                                         }
                                                                     }, 4000);
                                                                 }
-
-
                                                             }
                                                             return false;
                                                         }
@@ -1746,15 +1657,12 @@ public class MainActivity extends AppCompatActivity {
                                                         @Override
                                                         public void run() {
                                                             mTTS.speak("Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?", TextToSpeech.QUEUE_FLUSH, null);
-                                                            z = 7;
-                                                            x = 7;
+                                                            answerNo = 7;
+                                                            answerYes = 7;
                                                             mYes.setVisibility(View.VISIBLE);
                                                             mNo.setVisibility(View.VISIBLE);
                                                         }
                                                     }, 0);
-
-                                                    Log.i("value", "how are you");
-
 
                                                 }
                                             }, 1000);
@@ -1776,7 +1684,6 @@ public class MainActivity extends AppCompatActivity {
                                                 @Override
                                                 public void run() {
                                                     openActivity2();
-
                                                 }
                                             }, 4000);
                                         }
@@ -1791,13 +1698,16 @@ public class MainActivity extends AppCompatActivity {
 
                     });
 
-                } else if (z == 4) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 4) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
                     mTemp.setVisibility(View.INVISIBLE);
-
+                    //Creates the fail file in the local device storage
                     File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate +"Fail.txt");
+                    //Append the appropriate data to the file
                     try {
                         String answer1 = " 1-YES ";
                         String contEnter = "\r\n" + "["+shortDate + " "+ date+"] " + category + " NAME:"  + mName.getText().toString() + com.example.autoScreening_App.MainActivity2.getNumber + getAddress + " ENTERING:";
@@ -1813,6 +1723,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    //User failed so SMS alarm is sent
                     sendSMS();
 
                     Handler handler = new Handler();
@@ -1852,7 +1763,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
 
-                } else if (z == 5) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 5) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -1876,6 +1789,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    //User failed so SMS alarm is sent
                     sendSMS();
 
                     Handler handler = new Handler();
@@ -1912,7 +1826,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
 
-                } else if (z == 6) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 6) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -1975,7 +1891,9 @@ public class MainActivity extends AppCompatActivity {
                     }, 1000);
 
 
-                } else if (z == 7) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 7) {
                     mYes.setVisibility(View.VISIBLE);
                     mNo.setVisibility(View.VISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -1987,12 +1905,14 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mTTS.speak("Have you worked in facilities or offices with recognized COVID-19 cases?", TextToSpeech.QUEUE_FLUSH, null);
-                            z = 9;
-                            x = 9;
+                            answerNo = 9;
+                            answerYes = 9;
                         }
                     }, 0);
 
-                } else if (z == 8) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 8) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -2060,7 +1980,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
 //
-                } else if (z == 9) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 9) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -2129,7 +2051,9 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1000);
 
-                } else if (z == 10) {
+                }
+                //If user answers NO to previous screening question, it will enter the below Else If statement
+                else if (answerNo == 10) {
                     mYes.setVisibility(View.INVISIBLE);
                     mNo.setVisibility(View.INVISIBLE);
                     mName.setVisibility(View.INVISIBLE);
@@ -2206,9 +2130,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-
+    //This is the major class for my Digital Signature module
     public void dialog_action() {
-
+        //Initialize and Declare the various physical elements that are needed 
         mContent = (LinearLayout) dialog.findViewById(R.id.linearLayout);
         mSignature = new signature(getApplicationContext(), null);
         mSignature.setBackgroundColor(Color.WHITE);
@@ -2219,7 +2143,7 @@ public class MainActivity extends AppCompatActivity {
         mGetSign.setEnabled(false);
         mCancel = (Button) dialog.findViewById(R.id.cancel);
         view = mContent;
-
+        //Clear Button - clears whatever signature that has already been drawn on the signature pad
         mClear.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("log_tag", "Panel Cleared");
@@ -2227,7 +2151,10 @@ public class MainActivity extends AppCompatActivity {
                 mGetSign.setEnabled(false);
             }
         });
-
+        //When the user clicks save, this code is run
+        //Inside this part, it calls the save function that is written below
+        //The signature panel is dismissed and removed from the screen
+        //Finally, based on the situation (visitor or employee?, entering or exiting?), it asks the first screening question when this button is clicked as well
         mGetSign.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -2255,13 +2182,11 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }, 0);
 
-                            Log.i("value", "how are you");
                             Handler handler1 = new Handler();
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     btn_get_sign.setVisibility(View.INVISIBLE);
-                                    kyrie = 1;
                                     mYes.setVisibility(View.VISIBLE);
                                     mNo.setVisibility(View.VISIBLE);
                                     mYes.setEnabled(true);
@@ -2286,7 +2211,6 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }, 0);
 
-                            Log.i("value", "how are you");
                             Handler handler1 = new Handler();
                             handler1.postDelayed(new Runnable() {
                                 @Override
@@ -2314,20 +2238,16 @@ public class MainActivity extends AppCompatActivity {
                             handler2.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-//                                            mTTS.speak("Have you used the hand rub or worn the latex gloves?", TextToSpeech.QUEUE_FLUSH, null);
                                     mTTS.speak("Do you have a fever, sore throat, cough, or a runny nose?", TextToSpeech.QUEUE_FLUSH, null);
                                 }
                             }, 0);
 
-                            Log.i("value", "how are you");
                             Handler handler1 = new Handler();
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     btn_get_sign.setVisibility(View.INVISIBLE);
-                                    zion = 0;
-                                    kyrie = 1;
-                                    testing = 0;
+                                    visitorInformation = 0;
                                     mName.setVisibility(View.INVISIBLE);
                                     mYes.setVisibility(View.VISIBLE);
                                     mNo.setVisibility(View.VISIBLE);
@@ -2335,7 +2255,7 @@ public class MainActivity extends AppCompatActivity {
                                     mNo.setText("NO");
                                     mYes.setEnabled(true);
                                     mNo.setEnabled(true);
-                                    otherFamilyStart = 0;
+                                    otherFamilySelection = 0;
                                 }
                             }, 500);
                         }
@@ -2347,34 +2267,28 @@ public class MainActivity extends AppCompatActivity {
                         public void run() {
                             mName.setVisibility(View.INVISIBLE);
                             String weird = "Do you have a fever, sore throat, cough, or a runny nose?";
-                            // String weird = "Have you used the hand rub or worn the latex gloves?";
                             text.setText(weird);
                             Handler handler2 = new Handler();
                             handler2.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-//                                            mTTS.speak("Have you used the hand rub or worn the latex gloves?", TextToSpeech.QUEUE_FLUSH, null);
                                     mTTS.speak("Do you have a fever, sore throat, cough, or a runny nose?", TextToSpeech.QUEUE_FLUSH, null);
                                 }
                             }, 0);
 
-                            Log.i("value", "how are you");
                             Handler handler1 = new Handler();
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     btn_get_sign.setVisibility(View.INVISIBLE);
-                                    zion = 0;
-                                    kyrie = 1;
-                                    testing = 0;
-                                    otherFamilyStart = 0;
+                                    visitorInformation = 0;
+                                    otherFamilySelection = 0;
                                     visiting = 0;
                                     mName.setVisibility(View.INVISIBLE);
                                     mYes.setVisibility(View.VISIBLE);
                                     mNo.setVisibility(View.VISIBLE);
                                     mYes.setEnabled(true);
                                     mNo.setEnabled(true);
-                                    backButton.setVisibility(View.VISIBLE);
                                 }
                             }, 500);
                         }
@@ -2396,21 +2310,17 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }, 0);
 
-                            Log.i("value", "how are you");
                             Handler handler1 = new Handler();
                             handler1.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
                                     btn_get_sign.setVisibility(View.INVISIBLE);
-                                    zion = 0;
-                                    kyrie = 1;
-                                    testing = 0;
+                                    visitorInformation = 0;
                                     mName.setVisibility(View.INVISIBLE);
                                     mYes.setVisibility(View.VISIBLE);
                                     mNo.setVisibility(View.VISIBLE);
                                     mYes.setEnabled(true);
                                     mNo.setEnabled(true);
-                                    backButton.setVisibility(View.VISIBLE);
                                 }
                             }, 500);
 
@@ -2418,12 +2328,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 1500);
                 }
-                // Calling the same class
-               // recreate();
-
             }
         });
 
+        //When this button is clicked, the signature pad is dismissed and is not expanded
         mCancel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("log_tag", "Panel Canceled");
@@ -2435,9 +2343,9 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
+    //This is the class where the algorithm and base code for Digital Signature module is actually written
     public class signature extends View {
-
+        //Declare and Initialize the various private instance data that will be needed
         private static final float STROKE_WIDTH = 5f;
         private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
         private Paint paint = new Paint();
@@ -2447,6 +2355,8 @@ public class MainActivity extends AppCompatActivity {
         private float lastTouchY;
         private final RectF dirtyRect = new RectF();
 
+        //Signature constructor where I call the View superclass
+        //Modify the various properties of the paint object
         public signature(Context context, AttributeSet attrs) {
             super(context, attrs);
             paint.setAntiAlias(true);
@@ -2455,8 +2365,7 @@ public class MainActivity extends AppCompatActivity {
             paint.setStrokeJoin(Paint.Join.ROUND);
             paint.setStrokeWidth(STROKE_WIDTH);
         }
-
-
+        
         //saves signature to a png image
         public void save(View v, String StoredPath) {
             Log.v("log_tag", "Width: " + v.getWidth());
@@ -2501,11 +2410,12 @@ public class MainActivity extends AppCompatActivity {
             float eventX = event.getX();
             float eventY = event.getY();
             mGetSign.setEnabled(true);
-
+            //Switch and case statements to account for all of the drawing motions
+            //This is the algorithm that allows the user to actually draw the pixels on the Signature pad
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     path.moveTo(eventX, eventY);
-                    lastTouchX = eventX;
+                    lastTouchX= eventX;
                     lastTouchY = eventY;
                     return true;
 
@@ -2515,7 +2425,7 @@ public class MainActivity extends AppCompatActivity {
                     resetDirtyRect(eventX, eventY);
                     int historySize = event.getHistorySize();
                     for (int i = 0; i < historySize; i++) {
-                        float historicalX = event.getHistoricalX(i);
+                        float historicalX= event.getHistoricalX(i);
                         float historicalY = event.getHistoricalY(i);
                         expandDirtyRect(historicalX, historicalY);
                         path.lineTo(historicalX, historicalY);
@@ -2542,7 +2452,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //make signature pad bigger on screen
         private void expandDirtyRect(float historicalX, float historicalY) {
-            if (historicalX < dirtyRect.left) {
+            if (historicalX< dirtyRect.left) {
                 dirtyRect.left = historicalX;
             } else if (historicalX > dirtyRect.right) {
                 dirtyRect.right = historicalX;
@@ -2553,7 +2463,7 @@ public class MainActivity extends AppCompatActivity {
                 dirtyRect.bottom = historicalY;
             }
         }
-        //reset signature pad
+        //resets signature pad back to its normal size
         private void resetDirtyRect(float eventX, float eventY) {
             dirtyRect.left = Math.min(lastTouchX, eventX);
             dirtyRect.right = Math.max(lastTouchX, eventX);
@@ -2562,12 +2472,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    //Allows me to transition between app screens
     public void openActivity2() {
         screener+=1;
         Intent intent = new Intent(this, com.example.autoScreening_App.MainActivity2.class);
         startActivity(intent);
     }
+    //Function for sending the SMS alarm message
+    //This function is called everytime the user fails
+    //For this competition purposes, I do not have a phone number entered as the recipient 
+        //However, usually the nursing home administrator or supervisor's phone number is entered in the code
     private void sendSMS() {
         String SENT = "SMS_SENT";
         String DELIVERED = "SMS_DELIVERED";
@@ -2625,11 +2539,16 @@ public class MainActivity extends AppCompatActivity {
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage("Phone Number", null, mName.getText().toString() + " FAILED", sentPI, deliveredPI);
     }
+    //a function that I call a few times
+    //uses Android TextToSpeech to speak the words
    private void speak() {
-        String word = "Please type your name. Next, click sign this form, sign in the white box, and click save. \r\nACKNOWLEDGEMENT: By signing below I confirm that I have answered the above questions honestly and that I will self-monitor and immediately disclose to the Nursing Home Administrator or Manager on Duty any signs or symptoms of respiratory infection, including fever, cough, shortness of breath, or sore throat AND that I received education related to the infection prevention and donning/doffing PPE, AND THAT I WASHED OR SANITIZED MY HANDS PRIOR TO BEGINNING WORK AND/OR PROVIDING DIRECT CARE.";
+        String word = "Please type your name. Next, click sign this form, sign in the white box, and click save.";
         text.setText(word);
         mTTS.speak("Please type your name. Next, click sign this form, sign in the white box, and click save. ", TextToSpeech.QUEUE_FLUSH, null);
     }
+    
+    //This is essential for turning off the TextToSpeech when it is not called
+    //Prevents the app from crashing
     protected void onDestroy() {
 
         if (mTTS != null) {
@@ -2639,6 +2558,9 @@ public class MainActivity extends AppCompatActivity {
 
         super.onDestroy();
     }
+    //App asks for permission to create a file on the device's local storage 
+    //Also asks for SMS permission 
+    //This function is used to do this
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1000:
