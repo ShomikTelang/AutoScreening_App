@@ -1,96 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#BEECE6"
+    android:orientation="vertical"
     android:padding="8dp"
     tools:context=".MainActivity2">
 
 
     <TextView
         android:id="@+id/textTop"
-        android:layout_width="753dp"
-        android:layout_height="207dp"
-        android:autoSizeMaxTextSize="43sp"
-        android:autoSizeMinTextSize="40sp"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:autoSizeMaxTextSize="43dp"
+        android:autoSizeMinTextSize="20dp"
         android:autoSizeStepGranularity="4sp"
         android:autoSizeTextType="uniform"
-        android:text="Please use the hand sanitizer or wear latex gloves before you begin. You must enter screener's name to enable this form. Click the screener button."
+        android:text="Please use the hand sanitizer or wear latex gloves before you begin. Please select if you are a visitor, employee, or screener."
         android:textColor="#302B2B"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/enterText"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_marginBottom="8sp"
-        android:hint="Enter Name"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Enter Name: "
         android:imeActionLabel="actionDone"
-        android:inputType="textNoSuggestions"
-        android:textSize="40sp" />
+        android:inputType="textPersonName"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.208" />
 
     <EditText
         android:id="@+id/address"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
         android:hint="Enter Address"
         android:imeActionLabel="actionDone"
-        android:inputType="textNoSuggestions"
-        android:textSize="30sp"/>
-
+        android:inputType="textPersonName"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.305" />
 
     <Button
         android:id="@+id/visitor"
-        android:layout_width="622dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="25dp"
-        android:background="@drawable/button_bg_entry"
-        android:enabled="true"
+        android:layout_width="747dp"
+        android:layout_height="99dp"
+        android:background="@drawable/button_bg"
+        android:padding="10dp"
         android:text="VISITOR"
         android:textColor="#FFF"
-        android:textSize="35sp" />
+        android:textSize="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.422" />
 
     <Button
         android:id="@+id/employee"
-        android:layout_width="622dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/button_bg_entry"
-        android:layout_below = "@+id/visitor"
-        android:layout_marginBottom="30dp"
-        android:enabled="true"
+        android:layout_width="747dp"
+        android:layout_height="99dp"
+        android:background="@drawable/button_bg"
+        android:padding="10dp"
         android:text="EMPLOYEE"
         android:textColor="#FFF"
-        android:textSize="35sp"/>
+        android:textSize="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.575" />
 
     <Button
         android:id="@+id/screener"
-        android:layout_width="622dp"
-        android:layout_height="150dp"
-        android:layout_below="@+id/employee"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/button_bg_entry"
-        android:enabled="true"
+        android:layout_width="747dp"
+        android:layout_height="99dp"
+        android:background="@drawable/button_bg"
+        android:padding="10dp"
         android:text="SCREENER"
         android:textColor="#FFF"
-        android:textSize="35sp" />
+        android:textSize="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.724" />
 
-    <Button
-        android:id="@+id/back"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="10dp"
-        android:layout_below = "@id/screener"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/button_bg"
-        android:textColor="#FFF"
-        android:text="BACK"
-        android:textSize="35dp"/>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

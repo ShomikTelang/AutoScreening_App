@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,154 +11,167 @@
     tools:context=".MainActivity">
 
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
     <TextView
         android:id="@+id/shomtext"
-        android:layout_width="match_parent"
-        android:layout_height="238dp"
-        android:autoSizeMaxTextSize="38sp"
-        android:autoSizeMinTextSize="20sp"
-        android:autoSizeStepGranularity="4sp"
-        android:autoSizeTextType="uniform"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
         android:text="Please select if you are entering or exiting. You must answer all questions with yes or no."
+        android:autoSizeMaxTextSize="100sp"
+        android:autoSizeMinTextSize="24sp"
+        android:autoSizeStepGranularity="2sp"
+        android:autoSizeTextType="uniform"
+        android:minLines="3"
+        android:maxLines="4"
         android:textColor="#302B2B"
-        android:textStyle="bold" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.002" />
 
+    <Button
+        android:id="@+id/exiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:text="EXITING"
+        android:textColor="#FFF"
+        android:textSize="35dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.844" />
+
+    <Button
+        android:id="@+id/entering"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:text="ENTERING"
+        android:textSize="35dp"
+        android:textColor="#FFF"
+        android:background="@drawable/button_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.642" />
+
+    <Button
+        android:id="@+id/temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:text="TEMPERATURE"
+        android:textColor="#FFF"
+        android:textSize="35dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.43" />
+
+    <Button
+        android:id="@+id/yes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="YES"
+        android:textSize="45dp"
+        android:textColor="#FFF"
+        android:paddingTop="35dp"
+        android:paddingBottom="35dp"
+        android:background="@drawable/button_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.54" />
 
     <EditText
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginBottom="8sp"
-        android:hint="Enter Name"
-        android:imeOptions="actionDone"
-        android:inputType="text"
-        android:textSize="40sp" />
+        android:ems="10"
+        android:hint="Enter Name: "
+        android:inputType="textPersonName"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.191" />
 
     <EditText
         android:id="@+id/temp"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginBottom="8sp"
-        android:hint="Enter Temperature"
-        android:imeActionLabel="actionDone"
+        android:ems="10"
+        android:hint="Enter Temperature: "
         android:inputType="numberDecimal"
-        android:textSize="40sp" />
+        android:textSize="35sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.283" />
 
+    <Button
+        android:id="@+id/no"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_bg"
+        android:paddingTop="35dp"
+        android:paddingBottom="35dp"
+        android:text="NO"
+        android:textColor="#FFF"
+        android:textSize="45dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.892" />
 
     <TextView
         android:id="@+id/result"
-        android:layout_width="762dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:text="FAILED"
         android:textColor="#BA220E"
+        android:gravity="center_horizontal"
         android:textSize="90sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.383" />
 
     <Button
-        android:id="@+id/temperature"
+        android:id="@+id/signature"
         android:layout_width="564dp"
-        android:layout_height="84dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/yes"
         android:layout_gravity="center"
-        android:text="Temperature"
-        android:textSize="35sp"
-        android:textColor="#FFF"
-        android:background="@drawable/button_bg"/>
-
-    <Button
-        android:id="@+id/entering"
-        android:layout_width="540dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/button_bg2_entry"
-        android:enabled="false"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="-10dp"
-        android:text="ENTERING"
-        android:textColor="#FFF"
-        android:textSize="40sp" />
-    <Button
-        android:id="@+id/exiting"
-        android:layout_width="540dp"
-        android:layout_height="160dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/button_bg2_entry"
-        android:layout_below = "@+id/entering"
-        android:enabled="false"
-        android:text="EXITING"
-        android:textColor="#FFF"
-        android:textSize="40sp"/>
-
-    <Button
-        android:id="@+id/back2"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:layout_below="@id/no"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
         android:background="@drawable/button_bg"
-        android:text="BACK"
+        android:text="SIGN THIS FORM"
         android:textColor="#FFF"
-        android:textSize="35dp" />
+        android:textSize="35dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 
 
-</LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="10dp">
-
-
-
-        <Button
-            android:id="@+id/yes"
-            android:layout_width="540dp"
-            android:layout_height="200dp"
-            android:text="YES"
-            android:layout_below="@+id/temperature"
-            android:layout_marginTop="100dp"
-            android:enabled="false"
-            android:textSize="50dp"
-            android:textColor="#FFF"
-            android:background="@drawable/button_bg"/>
-        <Button
-            android:id="@+id/signature"
-            android:layout_width="564dp"
-            android:layout_height="150dp"
-            android:layout_below="@+id/yes"
-            android:layout_gravity="center"
-            android:background="@drawable/button_bg"
-            android:text="SIGN THIS FORM"
-            android:textColor="#FFF"
-            android:textSize="35dp"/>
-
-        <Button
-            android:id="@+id/no"
-            android:layout_width="540dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="50dp"
-            android:text="NO"
-            android:enabled="false"
-            android:textSize="50dp"
-            android:textColor="#FFF"
-            android:layout_below = "@+id/yes"
-            android:background="@drawable/button_bg" />
-
-
-
-    </LinearLayout>
-
-
-
-
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
