@@ -36,7 +36,6 @@ public class MainActivity2 extends AppCompatActivity {
     public static String getNumber;
     public static String category;
     public static String getAddress;
-    public static int zion =0;
     public static boolean visitingState = false;
 
     @Override
@@ -71,9 +70,9 @@ public class MainActivity2 extends AppCompatActivity {
                 }
             }
         });
-
+        //Many of the nursing home facilities wanted a screener to verify all of the people's data 
+        //Thus, I created a screener button that added their name and a key for all of the questions
         mScreener.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 mScreener.setVisibility(View.INVISIBLE);
@@ -92,6 +91,7 @@ public class MainActivity2 extends AppCompatActivity {
                             enterText.setHeight(120);
                             mEmployee.setEnabled(true);
                             mVisitor.setEnabled(true);
+                            //Creates a pass and failed file and appends data to both files
                             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate + "Pass.txt");
                             File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), fileDate +"Fail.txt");
                             try {
@@ -106,9 +106,7 @@ public class MainActivity2 extends AppCompatActivity {
                                             + "\r\n" + "4. Have you had contact for more than 10 minutes with someone who is suspected or confirmed COVID-19 positive or is awaiting test results?" + "\r\n" + "IF YES - 5. Do you match the COVID-19 vaccination criteria?" +
                                             "\r\n" + "6. Have you worked in facilities or offices with recognized COVID-19 cases?" + "\r\n" + "IF YES - 7. Were you wearing recommended personal protective equipment?";
                                     String questionsExit = "\r\n" + "1. Have you developed any symptoms that were referenced upon entry?";
-                                    // String cont = "\r\n" + "\r\n" + "SCREENER: " + mName.getText().toString();
                                     String cont = "\r\n" + "SCREENER:  " + enterText.getText().toString();
-                                    //fileWriter.append(cont);
                                     fileWriter.append(breaker);
                                     fileWriter.append(keyEnter);
                                     fileWriter.append(questionsEnter);
@@ -182,17 +180,19 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
+        //When the visitor button is clicked, it opens the next activity with the screening questions
         mVisitor.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 visitingState = true;
                 openActivity1();
+                category = "VISITOR ||";
 
             }
         });
 
-
+        //When the employee button is clicked, it opens the next activity with the screening questions 
         mEmployee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,7 +208,7 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
 
-
+    //Simple functions to open the next activity, and transition to the next Android screen
     public void openActivity1() {
         Intent intent = new Intent(this, com.example.autoScreening_App.MainActivity.class);
         startActivity(intent);
